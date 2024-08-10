@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './index.css';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:3000');
+const socket = io('https://tic-tac-toe-socket-io-rc9f.onrender.com');
 
 const App = () => {
   const [board, setBoard] = useState(Array(9).fill(null));
