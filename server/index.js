@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
   // Handle other events, e.g., message handling
   socket.on('send-message', (data) => {
     socket.broadcast.emit('receive-message', data);
-    // socket.emit('receive-message2', data);
+    socket.broadcast.emit('receive-message2', data);
   });
 });
 

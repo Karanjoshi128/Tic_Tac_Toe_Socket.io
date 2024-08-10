@@ -12,6 +12,7 @@ const App = () => {
   const [buttonColor2, setButtonColor2] = useState('bg-white');
   const [isButtonDisabled1, setIsButtonDisabled1] = useState(false);
   const [isButtonDisabled2, setIsButtonDisabled2] = useState(false);
+  const [disvalue, setDisValue] = useState(false);
 
   const winningConditions = [
     [0, 1, 2],
@@ -25,21 +26,23 @@ const App = () => {
   ];
 
   const handleClick = (index) => {
+    setDisValue(true);
     if (board[index] || winner) return;
 
     const newBoard = [...board];
     newBoard[index] = currentPlayer;
-    console.log(newBoard);
+    // console.log(newBoard);
     setBoard(newBoard);
     
     const newWinner = checkWinner(newBoard);
     if (newWinner) {
       setWinner(newWinner);
     }
-    // else {
-    //     setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
-    //   }
-      socket.emit('send-message', {newBoard , newWinner});
+    else {
+        setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+      }
+      const oppValue = disvalue;
+      socket.emit('send-message', {newBoard , newWinner , currentPlayer , oppValue});
   };
 
   const checkWinner = (board) => {
@@ -83,6 +86,7 @@ const handleRestart = () => {
     setIsButtonDisabled2(false);
     setButtonColor1('bg-white');
     setButtonColor2('bg-white');
+    setDisValue(false);
   };
 
 
@@ -93,16 +97,17 @@ const handleRestart = () => {
     )
 
     socket.on("receive-message" , (data) => {
-      console.log(data);
+      // console.log(data);
       setBoard(data.newBoard);
       if(data.newWinner){
         setWinner(data.newWinner);
       }
     })
 
-    // socket.on("receive-message2" , (data) => {
-    //   setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
-    // })
+    socket.on("receive-message2" , (data) => {
+      setCurrentPlayer(data.currentPlayer === 'O' ? 'X' : 'O');
+      setDisValue((data.oppValue));
+    })
   },[socket])
 
   return (
@@ -117,7 +122,7 @@ const handleRestart = () => {
         {board.map((value, index) => (
           <div
             key={index}
-            className="flex items-center justify-center w-24 h-24 bg-white border-2 border-gray-800 text-4xl cursor-pointer"
+            className={`flex items-center justify-center w-24 h-24 bg-white border-2 border-gray-800 text-4xl cursor-pointer ${disvalue ? 'pointer-events-none' : ''}`}
             onClick={() => handleClick(index)}
           >
             {value}
